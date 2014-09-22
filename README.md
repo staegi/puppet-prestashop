@@ -8,10 +8,14 @@ Usage
 
     prestashop::install{ '/var/www/internal.domain.net':
         version       => '1.6.0.9',
+        verbose       => false,
         theme_dir     => '/vagrant/project',
         domain        => 'internal.domain.net',
+        aliases       => '',
         webserver     => 'apache',
         priority      => '20',
+        docroot_owner => 'www-data',
+        docroot_group => 'www-data',
         ssl           => true,
         ssl_cert      => 'puppet:///modules/prestashop/sslkey/internal.domain.net.crt',
         ssl_key       => 'puppet:///modules/prestashop/sslkey/internal.domain.net.private.key',
