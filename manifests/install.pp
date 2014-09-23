@@ -13,10 +13,10 @@ define prestashop::install (
     ssl           => false,
     ssl_cert      => undef,
     ssl_key       => undef,
-    db_host       => 'localhost',
-    db_name       => 'ps_database',
-    db_user       => 'ps_user',
-    db_password   => 'ps_password',
+    db_host       => '172.0.0.1',
+    db_name       => undef,
+    db_user       => undef,
+    db_password   => undef,
     root_password => 'root',
 ) {
 
@@ -35,6 +35,16 @@ define prestashop::install (
             ensure => present,
             before => Archive['extract_archive'],
         }
+    }
+
+    wget::fetch { 'fetch_source_code':
+        source => "http://www.prestashop.com/download/prestashop_${version}.zip",
+        destination => "/tmp/prestashop_${version}.zip",
+        verbose => $verbose,
+    }
+    ->
+    unzip { "/tmp/prestashop_${version}.zip":
+        creates => $docroot,
     }
 
     if $webserver == 'apache' {
@@ -56,7 +66,7 @@ define prestashop::install (
             include nginx
         }
         nginx::vhost { $domain:
-            aliases => $aliases,
+            serveraliases => $aliases,
             docroot => $docroot,
             docroot_owner => $docroot_owner,
             docroot_group => $docroot_group,
@@ -67,36 +77,26 @@ define prestashop::install (
         }
     }
 
-    if $db_host == 'localhost' {
-        class { 'mysql::server':
-            root_password    => $root_password,
-            restart          => true,
-            override_options => {
-                'mysqld' => {
-                    'max_connections' => '128',
-                    'innodb_file_per_table' => 'on',
-                    'innodb_buffer_pool_size' => '512M',
-                    'innodb_log_buffer_size' => '4M',
-                    'bind-address' => '0.0.0.0',
-                }
-            },
+    if $db_host == '127.0.0.1' or $db_host == 'localhost' {
+        if ! defined(Class['mysql::server']) {
+            class { 'mysql::server':
+                root_password    => $root_password,
+                restart          => true,
+                override_options => {
+                    'mysqld' => {
+                        'max_connections' => '128',
+                        'innodb_file_per_table' => 'on',
+                        'innodb_buffer_pool_size' => '512M',
+                        'innodb_log_buffer_size' => '4M',
+                        'bind-address' => '0.0.0.0',
+                    }
+                },
+            }
         }
-        ->
+
         mysql::db { $db_name:
             user     => $db_user,
             password => $db_password,
         }
     }
-
-    wget::fetch { 'fetch_source_code':
-        source => "http://www.prestashop.com/download/prestashop_${version}.zip",
-        destination => '/tmp/prestashop.zip',
-        verbose => $verbose,
-    }
-    ->
-    archive { "extract_archive"
-        source => "/tmp/prestashop.zip",
-        creates => $docroot,
-    }
-
 }

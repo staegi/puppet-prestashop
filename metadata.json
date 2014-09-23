@@ -1,0 +1,18 @@
+{
+    "name": "staegi-prestashop",
+    "version": "0.0.1",
+    "author": "Thomas Stägemann",
+    "license": "Licensed under (Apache 2.0)",
+    "summary": "A module to install a Prestashop",
+    "source": "https://github.com/staegi/puppet-prestashop",
+    "project_page": "(https://forge.puppetlabs.com/staegi/prestashop)",
+    "issues_url": "",
+    "tags": ["Prestashop"],
+    "dependencies": [
+        {"name": "puppetlabs/mysql", "version_requirement": ">=2.3.1"},
+        {"name": "puppetlabs/apache", "version_requirement": ">=1.1.1"},
+        {"name": "jfryman/nginx", "version_requirement": ">=0.0.10"},
+        {"name": "maestrodev/wget", "version_requirement": ">=1.5.7"},
+        {"name": "reidmv/unzip", "version_requirement": ">=0.1.1"}
+    ]
+}
