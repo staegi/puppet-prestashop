@@ -46,6 +46,11 @@ define prestashop::install (
     unzip { "/tmp/prestashop_${version}.zip":
         creates => $docroot,
     }
+    ->
+    file { "$docroot/themes/default":
+        ensure => 'link',
+        target => $theme_dir,
+    }
 
     if $webserver == 'apache' {
         if ! defined(Class['apache']) {
